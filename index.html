@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IMAX 包場報到</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🎬【Stray Kids: The dominATE Experience】包場活動報到</h1>
+
+    <label for="name">請輸入報名時的「本名」</label>
+    <input
+      type="text"
+      id="name"
+      placeholder="例：方CC"
+      autocomplete="off"
+    />
+
+    <button onclick="checkIn()">我已到場</button>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
