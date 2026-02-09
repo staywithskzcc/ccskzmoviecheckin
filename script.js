@@ -17,13 +17,14 @@ function formatSeat(seat) {
     return `${row}排${number}號`;
   }
 
-  // 若格式不符，原樣顯示（保底，不會炸）
+  // 若格式不符，原樣顯示
   return text;
 }
 
 async function checkIn() {
   const nameInput = document.getElementById("name");
   const result = document.getElementById("result");
+  const button = document.querySelector("button");
 
   const name = nameInput.value.trim();
 
@@ -32,7 +33,10 @@ async function checkIn() {
     return;
   }
 
-  result.textContent = "處理中，請稍候…";
+  // ⚡ 體感加速：立刻給回饋
+  button.disabled = true;
+  button.textContent = "確認中…";
+  result.textContent = "✔️ 已確認報名資料，請稍候";
 
   try {
     // ⚠️ 不加 Content-Type，避免 CORS 預檢
@@ -47,13 +51,18 @@ async function checkIn() {
 
     const data = await res.json();
 
+    // 🪑 座位顯示判斷
+    const seatText = data.seat
+      ? `🎟️ ${formatSeat(data.seat)}`
+      : `⚠️ 您還未選位
+請找 CC 詢問目前可入座的空位`;
+
     // ✅ 第一次成功報到
     if (data.status === "success") {
       result.textContent =
 `✅ 報到完成！
 
-您的座位是：
-🎟️ ${formatSeat(data.seat)}
+${seatText}
 
 感謝您前來參加
 【Stray Kids: The dominATE Experience】包場活動 💙
@@ -74,8 +83,7 @@ async function checkIn() {
       result.textContent =
 `ℹ️ 您已於 ${timeText} 完成報到
 
-您的座位是：
-🎟️ ${formatSeat(data.seat)}
+${seatText}
 
 請確認您已領取：
 ✔️ 電影票與特典
@@ -88,16 +96,21 @@ async function checkIn() {
     else if (data.status === "not_found") {
       result.textContent =
 `❌ 查無此報名資料
-請確認輸入的是【報名本名】或請找 CC 協助`;
+請確認輸入的是【報名本名】
+或請找 CC 協助`;
     }
 
-    // ❓ 其他異常狀態
+    // ❓ 其他異常
     else {
       result.textContent = "系統回傳異常，請找 CC 協助";
     }
 
   } catch (err) {
     console.error("Fetch error:", err);
-    result.textContent = "連線失敗，請檢查網路或找 CC 協助";
+    result.textContent = "⚠️ 系統忙碌，請直接找 CC 協助";
   }
+
+  // 🔓 解鎖按鈕
+  button.disabled = false;
+  button.textContent = "我已到場";
 }
