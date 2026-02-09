@@ -17,17 +17,14 @@ function checkIn() {
     return;
   }
 
-  /* 🔥 ① 立刻顯示最終成功畫面（0 秒） */
+  /* ① 先顯示「暫時成功畫面」 */
   button.disabled = true;
-  button.textContent = "已完成";
+  button.textContent = "確認中…";
 
   result.textContent =
-`✅ 報到完成！
+`⏳ 正在確認報名資料…`;
 
-正在確認您的座位資訊…
-（您可先找 CC 領取票券）`;
-
-  /* 🔄 ② 背景送出請求（不 await） */
+  /* ② 背景送出請求 */
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({ name })
@@ -35,8 +32,18 @@ function checkIn() {
   .then(res => res.json())
   .then(data => {
 
-    let seatBlock = "";
+    /* ❌ 沒報名 → 直接推翻 */
+    if (data.status === "not_found") {
+      result.textContent =
+`❌ 查無此報名資料
 
+請確認輸入的是【報名本名】
+或請直接找 CC 協助`;
+      return;
+    }
+
+    /* 🪑 座位判斷 */
+    let seatBlock = "";
     if (data.seat) {
       seatBlock =
 `您的座位是：
@@ -47,7 +54,7 @@ function checkIn() {
 請找 CC 詢問目前可入座的空位`;
     }
 
-    /* 🪑 ③ 座位回來後再補上 */
+    /* ✅ 真正成功畫面 */
     result.textContent =
 `✅ 報到完成！
 
