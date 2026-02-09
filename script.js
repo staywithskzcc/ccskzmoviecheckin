@@ -1,26 +1,35 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbyPOzQkXLRmZsMfIIphkn_vpFxmyKtqc3xvUw0zigCqg_fh2Gc8U0Lo6K7LhjLnDu3q1Q/exec";
+// ⚠️ 請確認這是你「最新重新部署」的 Web App URL
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbyPOzQkXLRmZsMfIIphkn_vpFxmyKtqc3xvUw0zigCqg_fh2Gc8U0Lo6K7LhjLnDu3q1Q/exec";
 
 async function checkIn() {
-  const name = document.getElementById("name").value.trim();
+  const nameInput = document.getElementById("name");
   const result = document.getElementById("result");
+
+  const name = nameInput.value.trim();
 
   if (!name) {
     result.textContent = "請輸入本名";
     return;
   }
 
- result.textContent = "【前端已更新】處理中，請稍候…";
-
+  // 🔎 用來確認前端版本（之後可拿掉）
+  result.textContent = "處理中，請稍候…";
 
   try {
+    // ⚠️ 重點：不要加 Content-Type，避免 CORS 預檢
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name })
     });
 
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+
     const data = await res.json();
 
+    // ✅ 報到成功
     if (data.status === "success") {
       result.textContent =
 `✅ 報到完成！
@@ -38,9 +47,14 @@ async function checkIn() {
 祝您和 Stray Kids 度過愉快的下午！`;
     }
 
+    // ℹ️ 已報到過
     else if (data.status === "already") {
+      const timeText = data.time
+        ? new Date(data.time).toLocaleString("zh-TW")
+        : "先前";
+
       result.textContent =
-`ℹ️ 您已於 ${new Date(data.time).toLocaleString("zh-TW")} 完成報到
+`ℹ️ 您已於 ${timeText} 完成報到
 
 您的座位是：
 🎟️ ${data.seat}
@@ -52,17 +66,20 @@ async function checkIn() {
 祝您和 Stray Kids 度過愉快的下午 💙`;
     }
 
+    // ❌ 查無資料
     else if (data.status === "not_found") {
       result.textContent =
 `❌ 查無此報名資料
 請確認輸入的是【報名本名】或請找 CC 協助`;
     }
 
+    // ❓ 其他未預期狀態
     else {
-      result.textContent = "系統錯誤，請找 CC 協助";
+      result.textContent = "系統回傳異常，請找 CC 協助";
     }
 
   } catch (err) {
+    console.error("Fetch error:", err);
     result.textContent = "連線失敗，請檢查網路或找 CC 協助";
   }
 }
