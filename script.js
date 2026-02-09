@@ -65,3 +65,4 @@ async function checkIn() {
     result.textContent = "連線失敗，請檢查網路或找 CC 協助";
   }
 }
+// force redeploy
