@@ -1,5 +1,5 @@
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbyPOzQkXLRmZsMfIIphkn_vpFxmyKtqc3xvUw0zigCqg_fh2Gc8U0Lo6K7LhjLnDu3q1Q/exec";
+  "https://script.google.com/macros/s/AKfycbyLwkAZn8etXEssuTuCz2i58eXDkL-idjSzHesbEfkbAlXiPGnLJU9SrNTNM9hJ7k8Osw/exec";
 
 // 將 L20 → L排20號
 function formatSeat(seat) {
