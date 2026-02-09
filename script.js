@@ -2,6 +2,25 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbyPOzQkXLRmZsMfIIphkn_vpFxmyKtqc3xvUw0zigCqg_fh2Gc8U0Lo6K7LhjLnDu3q1Q/exec";
 
+// 將座位格式化成：L排20號
+function formatSeat(seat) {
+  if (!seat) return "";
+
+  const text = String(seat).trim();
+
+  // 支援格式：L20 / l20 / L 20 / l 20
+  const match = text.match(/^([A-Za-z])\s*(\d+)$/);
+
+  if (match) {
+    const row = match[1].toUpperCase();
+    const number = match[2];
+    return `${row}排${number}號`;
+  }
+
+  // 若格式不符，原樣顯示（保底，不會炸）
+  return text;
+}
+
 async function checkIn() {
   const nameInput = document.getElementById("name");
   const result = document.getElementById("result");
@@ -13,11 +32,10 @@ async function checkIn() {
     return;
   }
 
-  // 🔎 用來確認前端版本（之後可拿掉）
   result.textContent = "處理中，請稍候…";
 
   try {
-    // ⚠️ 重點：不要加 Content-Type，避免 CORS 預檢
+    // ⚠️ 不加 Content-Type，避免 CORS 預檢
     const res = await fetch(API_URL, {
       method: "POST",
       body: JSON.stringify({ name })
@@ -29,13 +47,13 @@ async function checkIn() {
 
     const data = await res.json();
 
-    // ✅ 報到成功
+    // ✅ 第一次成功報到
     if (data.status === "success") {
       result.textContent =
 `✅ 報到完成！
 
 您的座位是：
-🎟️ ${data.seat}
+🎟️ ${formatSeat(data.seat)}
 
 感謝您前來參加
 【Stray Kids: The dominATE Experience】包場活動 💙
@@ -57,7 +75,7 @@ async function checkIn() {
 `ℹ️ 您已於 ${timeText} 完成報到
 
 您的座位是：
-🎟️ ${data.seat}
+🎟️ ${formatSeat(data.seat)}
 
 請確認您已領取：
 ✔️ 電影票與特典
@@ -73,7 +91,7 @@ async function checkIn() {
 請確認輸入的是【報名本名】或請找 CC 協助`;
     }
 
-    // ❓ 其他未預期狀態
+    // ❓ 其他異常狀態
     else {
       result.textContent = "系統回傳異常，請找 CC 協助";
     }
