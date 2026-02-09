@@ -9,7 +9,8 @@ async function checkIn() {
     return;
   }
 
-  result.textContent = "處理中，請稍候…";
+  result.textContent = "前端已更新，正在連線…";
+
 
   try {
     const res = await fetch(API_URL, {
