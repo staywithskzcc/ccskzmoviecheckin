@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycby9SbJ3eh-PH2TVziH0Zz-VctySeuw772xyHQqlFA-7SvktfKlPBnXVj-ijkcfg0kClLQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyPOzQkXLRmZsMfIIphkn_vpFxmyKtqc3xvUw0zigCqg_fh2Gc8U0Lo6K7LhjLnDu3q1Q/exec";
 
 async function checkIn() {
   const name = document.getElementById("name").value.trim();
