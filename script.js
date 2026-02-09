@@ -9,7 +9,7 @@ async function checkIn() {
     return;
   }
 
-  result.textContent = "前端已更新，正在連線…";
+ result.textContent = "【前端已更新】處理中，請稍候…";
 
 
   try {
@@ -66,4 +66,3 @@ async function checkIn() {
     result.textContent = "連線失敗，請檢查網路或找 CC 協助";
   }
 }
-// force redeploy
