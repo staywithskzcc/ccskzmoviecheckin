@@ -3,17 +3,11 @@ const API_URL =
 
 function formatSeat(seat) {
   if (!seat) return "";
-
-  const text = String(seat).trim();
-  const match = text.match(/^([A-Za-z])\s*(\d+)$/);
-
-  if (match) {
-    return `${match[1].toUpperCase()}排${match[2]}號`;
-  }
-  return text;
+  const m = String(seat).trim().match(/^([A-Za-z])\s*(\d+)$/);
+  return m ? `${m[1].toUpperCase()}排${m[2]}號` : seat;
 }
 
-async function checkIn() {
+function checkIn() {
   const name = document.getElementById("name").value.trim();
   const result = document.getElementById("result");
   const button = document.querySelector("button");
@@ -23,25 +17,24 @@ async function checkIn() {
     return;
   }
 
-  /* 🔥 ① 立刻顯示成功（體感 0 秒） */
+  /* 🔥 ① 立刻顯示最終成功畫面（0 秒） */
   button.disabled = true;
-  button.textContent = "完成中…";
+  button.textContent = "已完成";
 
   result.textContent =
 `✅ 報到完成！
 
-正在確認您的座位資訊…`;
+正在確認您的座位資訊…
+（您可先找 CC 領取票券）`;
 
-  try {
-    /* 🔄 ② 背後才慢慢等後端 */
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({ name })
-    });
+  /* 🔄 ② 背景送出請求（不 await） */
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({ name })
+  })
+  .then(res => res.json())
+  .then(data => {
 
-    const data = await res.json();
-
-    /* 🪑 ③ 補上座位資訊（如果有） */
     let seatBlock = "";
 
     if (data.seat) {
@@ -54,6 +47,7 @@ async function checkIn() {
 請找 CC 詢問目前可入座的空位`;
     }
 
+    /* 🪑 ③ 座位回來後再補上 */
     result.textContent =
 `✅ 報到完成！
 
@@ -68,13 +62,14 @@ ${seatBlock}
 
 祝您和 Stray Kids 度過愉快的下午！`;
 
-  } catch (err) {
-    console.error(err);
+  })
+  .catch(() => {
     result.textContent =
 `⚠️ 系統忙碌中
 請直接找 CC 協助`;
-  }
-
-  button.disabled = false;
-  button.textContent = "我已到場";
+  })
+  .finally(() => {
+    button.disabled = false;
+    button.textContent = "我已到場";
+  });
 }
