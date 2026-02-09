@@ -1,8 +1,8 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbyPOzQkXLRmZsMfIIphkn_vpFxmyKtqc3xvUw0zigCqg_fh2Gc8U0Lo6K7LhjLnDu3q1Q/exec";
 
+// 單一座位轉成：L排20號
 function formatSeat(seat) {
-  if (!seat) return "";
   const m = String(seat).trim().match(/^([A-Za-z])\s*(\d+)$/);
   return m ? `${m[1].toUpperCase()}排${m[2]}號` : seat;
 }
@@ -17,14 +17,11 @@ function checkIn() {
     return;
   }
 
-  /* ① 先顯示「暫時成功畫面」 */
+  // ① 立刻顯示「確認中」
   button.disabled = true;
   button.textContent = "確認中…";
+  result.textContent = "⏳ 正在確認報名資料…";
 
-  result.textContent =
-`⏳ 正在確認報名資料…`;
-
-  /* ② 背景送出請求 */
   fetch(API_URL, {
     method: "POST",
     body: JSON.stringify({ name })
@@ -32,29 +29,28 @@ function checkIn() {
   .then(res => res.json())
   .then(data => {
 
-    /* ❌ 沒報名 → 直接推翻 */
+    // ❌ 沒報名
     if (data.status === "not_found") {
       result.textContent =
 `❌ 查無此報名資料
-
 請確認輸入的是【報名本名】
 或請直接找 CC 協助`;
       return;
     }
 
-    /* 🪑 座位判斷 */
+    // 🪑 多座位顯示
     let seatBlock = "";
-    if (data.seat) {
+    if (Array.isArray(data.seats) && data.seats.length > 0) {
       seatBlock =
 `您的座位是：
-🎟️ ${formatSeat(data.seat)}`;
+🎟️ ${data.seats.map(formatSeat).join("\n🎟️ ")}`;
     } else {
       seatBlock =
 `⚠️ 您尚未選位
 請找 CC 詢問目前可入座的空位`;
     }
 
-    /* ✅ 真正成功畫面 */
+    // ✅ 成功畫面
     result.textContent =
 `✅ 報到完成！
 
